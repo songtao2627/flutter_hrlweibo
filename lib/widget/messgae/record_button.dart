@@ -5,10 +5,10 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hrlweibo/constant/constant.dart';
-import 'package:flutter_record_plugin/flutter_record_plugin.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'ImagesAnimation.dart';
+import 'audio_recorder.dart';
 
 OverlayEntry mOverlayEntry;
 
@@ -117,13 +117,14 @@ class _RecordButtonState extends State<RecordButton> {
         '/' +
         new DateTime.now().millisecondsSinceEpoch.toString();
     print("开始录音路径: $path");
-    await FlutterRecordPlugin.start(
+
+    await AudioRecorder.start(
         path: path, audioOutputFormat: AudioOutputFormat.AAC);
-    bool isRecording = await FlutterRecordPlugin.isRecording;
+    bool isRecording = await AudioRecorder.isRecording;
   }
 
   cancelRecord() async {
-    var recording = await FlutterRecordPlugin.stop();
+    var recording = await AudioRecorder.stop();
     File file = mLocalFileSystem.file(recording.path);
     file.delete();
     print("取消录音删除文件成功!");
@@ -148,8 +149,8 @@ class _RecordButtonState extends State<RecordButton> {
       showAnim = false;
       mButtonText = "按住录音";
       mOverlayEntry.markNeedsBuild();
-      var recording = await FlutterRecordPlugin.stop();
-      bool isRecording = await FlutterRecordPlugin.isRecording;
+      var recording = await AudioRecorder.stop();
+      bool isRecording = await AudioRecorder.isRecording;
       File file = mLocalFileSystem.file(recording.path);
       file.delete();
       print("录音时间太短:删除文件成功!");
@@ -162,7 +163,7 @@ class _RecordButtonState extends State<RecordButton> {
     } else {
       print("录音完成");
 
-      var recording = await FlutterRecordPlugin.stop();
+      var recording = await AudioRecorder.stop();
       print("Stop recording: ${recording.path}");
       File file = mLocalFileSystem.file(recording.path);
       print("  File length: ${recording.duration.inSeconds}");
@@ -179,7 +180,6 @@ class _RecordButtonState extends State<RecordButton> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _assetList.add(Constant.ASSETS_IMG + "ic_volume_1.png");
     _assetList.add(Constant.ASSETS_IMG + "ic_volume_2.png");
